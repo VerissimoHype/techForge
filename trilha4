@@ -1,0 +1,89 @@
+interface Produto {
+  id: number;
+  nome: string;
+  preco: number;
+}
+
+class ItemLoja implements Produto {
+  constructor(
+    public id: number,
+    public nome: string,
+    public preco: number
+  ) {}
+}
+interface Documento {
+  titulo: string;
+  conteudo: string;
+}
+
+class Texto implements Documento {
+  constructor(
+    public titulo: string,
+    public conteudo: string
+  ) {}
+
+  exibir(): string {
+    return `Título: ${this.titulo}, Conteúdo: ${this.conteudo}`;
+  }
+}
+interface ProdutoLoja {
+  codigo: number;
+  nome: string;
+}
+
+class Loja {
+  produtos: ProdutoLoja[] = [];
+
+  constructor(produtos: ProdutoLoja[]) {
+    this.produtos = produtos;
+  }
+
+  buscarProdutoPorCodigo(codigo: number): ProdutoLoja | undefined {
+    return this.produtos.find((p) => p.codigo === codigo);
+  }
+}
+interface Livro {
+  titulo: string;
+  autor: string;
+  disponivel: boolean;
+}
+
+class Biblioteca {
+  livros: Livro[] = [];
+
+  constructor(livros: Livro[]) {
+    this.livros = livros;
+  }
+
+  buscarLivrosDisponiveis(): Livro[] {
+    return this.livros.filter((livro) => livro.disponivel);
+  }
+}
+interface LivroBiblioteca {
+  titulo: string;
+  autor: string;
+  genero: string;
+  disponivel: boolean;
+}
+
+class BibliotecaGestao {
+  livros: LivroBiblioteca[] = [];
+
+  constructor(livros: LivroBiblioteca[]) {
+    this.livros = livros;
+  }
+
+  filtrarPorGenero(genero: string): LivroBiblioteca[] {
+    return this.livros.filter((l) => l.genero === genero);
+  }
+
+  buscarPorAutor(autor: string): LivroBiblioteca[] {
+    return this.livros.filter((l) => l.autor === autor);
+  }
+
+  obterLivrosDisponiveisOrdenados(): LivroBiblioteca[] {
+    return this.livros
+      .filter((l) => l.disponivel)
+      .sort((a, b) => a.titulo.localeCompare(b.titulo));
+  }
+}
