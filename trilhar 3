@@ -1,0 +1,262 @@
+// exercicio 01
+// Classe base
+class Veiculo {
+  mover() {
+    console.log("O veículo está se movendo");
+  }
+}
+
+// Subclasse Carro
+class Carro extends Veiculo {
+  mover() {
+    console.log("O carro está dirigindo");
+  }
+}
+
+// Subclasse Bicicleta
+class Bicicleta extends Veiculo {
+  mover() {
+    console.log("A bicicleta está pedalando");
+  }
+}
+
+// Instanciando objetos
+const carro = new Carro();
+const bicicleta = new Bicicleta();
+
+// Chamando métodos
+carro.mover();       // O carro está dirigindo
+bicicleta.mover();   // A bicicleta está pedalando
+
+// exercicio 02
+// Classe abstrata
+abstract class FiguraGeometrica {
+  abstract calcularArea(): number;
+}
+
+// Subclasse Círculo
+class Circulo extends FiguraGeometrica {
+  constructor(private raio: number) {
+    super();
+  }
+
+  calcularArea(): number {
+    return Math.PI * this.raio * this.raio;
+  }
+}
+
+// Subclasse Quadrado
+class Quadrado extends FiguraGeometrica {
+  constructor(private lado: number) {
+    super();
+  }
+
+  calcularArea(): number {
+    return this.lado * this.lado;
+  }
+}
+
+// Subclasse Triângulo
+class Triangulo extends FiguraGeometrica {
+  constructor(private base: number, private altura: number) {
+    super();
+  }
+
+  calcularArea(): number {
+    return (this.base * this.altura) / 2;
+  }
+}
+
+// Função que recebe um array de figuras e imprime as áreas
+function imprimirAreas(figuras: FiguraGeometrica[]) {
+  figuras.forEach((figura, index) => {
+    console.log(`Área da figura ${index + 1}:`, figura.calcularArea());
+  });
+}
+
+// Criando objetos
+const figuras: FiguraGeometrica[] = [
+  new Circulo(5),
+  new Quadrado(4),
+  new Triangulo(6, 3)
+];
+
+// Chamando a função
+imprimirAreas(figuras);
+
+// exercicio 03
+// Classe base
+class Pagamento {
+  processar(): void {
+    console.log("Processando pagamento genérico...");
+  }
+}
+
+// Subclasse PagamentoCartao
+class PagamentoCartao extends Pagamento {
+  constructor(private numeroCartao: string) {
+    super();
+  }
+
+  private validarCartao(): boolean {
+    // Validação simples: cartão precisa ter 16 dígitos
+    return /^\d{16}$/.test(this.numeroCartao);
+  }
+
+  processar(): void {
+    if (this.validarCartao()) {
+      console.log("Pagamento com cartão aprovado.");
+    } else {
+      console.log("Número de cartão inválido.");
+    }
+  }
+}
+
+// Subclasse PagamentoBoleto
+class PagamentoBoleto extends Pagamento {
+  private gerarCodigoBoleto(): string {
+    // Código fictício de 47 dígitos
+    return Math.random().toString().slice(2, 49);
+  }
+
+  processar(): void {
+    const codigo = this.gerarCodigoBoleto();
+    console.log("Boleto gerado com sucesso. Código:", codigo);
+  }
+}
+
+// Função polimórfica que processa qualquer tipo de pagamento
+function processarPagamentos(pagamentos: Pagamento[]) {
+  pagamentos.forEach((pagamento) => {
+    pagamento.processar();
+  });
+}
+
+// Teste
+const pagamentos: Pagamento[] = [
+  new PagamentoCartao("1234567890123456"),  // válido
+  new PagamentoCartao("9999"),              // inválido
+  new PagamentoBoleto()
+];
+
+processarPagamentos(pagamentos);
+
+// exercicio 04
+
+// Classe base
+class Animal {
+  private energia: number;
+
+  constructor(energiaInicial: number = 50) {
+    this.energia = energiaInicial;
+  }
+
+  protected alterarEnergia(valor: number) {
+    this.energia += valor;
+    if (this.energia < 0) this.energia = 0;
+  }
+
+  comer(): void {
+    console.log("O animal está comendo...");
+    this.alterarEnergia(+10);
+  }
+
+  statusEnergia(): void {
+    console.log(`Energia atual: ${this.energia}`);
+  }
+}
+
+// Subclasse Leão
+class Leao extends Animal {
+  comer(): void {
+    console.log("O leão está caçando...");
+    this.alterarEnergia(-20); // gastar energia caçando
+    console.log("O leão conseguiu comida!");
+    this.alterarEnergia(+30); // recuperar energia após comer
+  }
+}
+
+// Subclasse Pássaro
+class Passaro extends Animal {
+  comer(): void {
+    console.log("O pássaro está bicando sementes...");
+    this.alterarEnergia(+15); // apenas aumenta energia
+  }
+}
+
+// Função polimórfica
+function alimentarAnimais(animais: Animal[]) {
+  animais.forEach((animal) => {
+    animal.comer();
+    animal.statusEnergia();
+    console.log("-----------");
+  });
+}
+
+// Teste
+const animais: Animal[] = [
+  new Leao(60),
+  new Passaro(40),
+  new Leao(30),
+];
+
+alimentarAnimais(animais);
+
+// exercio 05
+// Classe abstrata
+abstract class Funcionario {
+  private nome: string;
+  private salario: number;
+
+  constructor(nome: string, salario: number) {
+    this.nome = nome;
+    this.salario = salario;
+  }
+
+  getNome(): string {
+    return this.nome;
+  }
+
+  getSalario(): number {
+    return this.salario;
+  }
+
+  // Método abstrato que cada subclasse deve implementar
+  abstract calcularBonus(): number;
+}
+
+// Subclasse Gerente
+class Gerente extends Funcionario {
+  calcularBonus(): number {
+    return this.getSalario() * 0.10; // 10% de bônus
+  }
+}
+
+// Subclasse Operario
+class Operario extends Funcionario {
+  calcularBonus(): number {
+    return this.getSalario() * 0.05; // 5% de bônus
+  }
+}
+
+// Função polimórfica para calcular salário final
+function calcularSalarioComBonus(funcionarios: Funcionario[]) {
+  funcionarios.forEach((func) => {
+    const salarioFinal = func.getSalario() + func.calcularBonus();
+
+    console.log(
+      `${func.getNome()} - Salário base: R$${func.getSalario().toFixed(
+        2
+      )}, Salário com bônus: R$${salarioFinal.toFixed(2)}`
+    );
+  });
+}
+
+// Teste
+const funcionarios: Funcionario[] = [
+  new Gerente("Carlos", 8000),
+  new Operario("João", 3000),
+  new Operario("Marcos", 2500),
+];
+
+calcularSalarioComBonus(funcionarios);
