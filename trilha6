@@ -1,1 +1,158 @@
+// ----------- 1. VERSÃO ERRADA (TUDO JUNTO) -----------
+
+class Order {
+  items: { name: string; price: number }[] = [];
+  totalPrice: number = 0;
+  paymentStatus: string = "pending";
+  shippingStatus: string = "not shipped";
+
+  addItem(item: { name: string; price: number }) {
+    this.items.push(item);
+    this.calculateTotal();
+  }
+
+  calculateTotal() {
+    this.totalPrice = this.items.reduce((acc, item) => acc + item.price, 0);
+  }
+
+  processPayment() {
+    if (this.totalPrice > 0) {
+      this.paymentStatus = "paid";
+    }
+  }
+
+  updateShippingStatus(status: string) {
+    this.shippingStatus = status;
+  }
+}
+// ----------- 1. VERSÃO CORRETA (RESPONSABILIDADES SEPARADAS) -----------
+
+class Cart {
+  private items: { name: string; price: number }[] = [];
+
+  addItem(item: { name: string; price: number }) {
+    this.items.push(item);
+  }
+
+  getItems() {
+    return this.items;
+  }
+
+  getTotalPrice(): number {
+    return this.items.reduce((acc, item) => acc + item.price, 0);
+  }
+}
+
+class Payment {
+  status: string = "pending";
+
+  process(totalPrice: number) {
+    if (totalPrice > 0) {
+      this.status = "paid";
+    }
+  }
+}
+
+class Shipping {
+  status: string = "not shipped";
+
+  updateStatus(status: string) {
+    this.status = status;
+  }
+}
+
+class Order {
+  constructor(
+    private cart: Cart,
+    private payment: Payment,
+    private shipping: Shipping
+  ) {}
+
+  addItem(item: { name: string; price: number }) {
+    this.cart.addItem(item);
+  }
+
+  checkout() {
+    const total = this.cart.getTotalPrice();
+    this.payment.process(total);
+    this.shipping.updateStatus("preparing");
+  }
+
+  getSummary() {
+    return {
+      items: this.cart.getItems(),
+      totalPrice: this.cart.getTotalPrice(),
+      paymentStatus: this.payment.status,
+      shippingStatus: this.shipping.status
+    };
+  }
+}
+
+// ----------- 2. VERSÃO ERRADA (TUDO JUNTO) -----------
+
+class UserManager {
+  private users: string[] = [];
+
+  createUser(name: string, email: string) {
+    this.users.push(name);
+    this.sendEmail(email, "Bem-vindo!", "Seu usuário foi criado!");
+  }
+
+  sendEmail(to: string, subject: string, message: string) {
+    console.log(`Enviando email para ${to}: ${subject} - ${message}`);
+  }
+}
+// ----------- 2. VERSÃO CORRETA (RESPONSABILIDADE SEPARADA) -----------
+
+class EmailNotification {
+  sendEmail(to: string, subject: string, message: string) {
+    console.log(`Email enviado para ${to}: ${subject} - ${message}`);
+  }
+}
+
+class UserManager {
+  private users: string[] = [];
+
+  constructor(private emailNotification: EmailNotification) {}
+
+  createUser(name: string, email: string) {
+    this.users.push(name);
+
+    this.emailNotification.sendEmail(
+      email,
+      "Bem-vindo!",
+      "Seu usuário foi criado!"
+    );
+  }
+}
+// ----------- 3. VERSÃO ERRADA (TUDO JUNTO) -----------
+
+class EmailSender {
+  sendEmail(contact: { email: string }, message: string) {
+    if (!contact.email.includes("@")) {
+      throw new Error("Email inválido");
+    }
+
+    console.log(`Enviando email para ${contact.email}: ${message}`);
+  }
+}
+// ----------- 3. VERSÃO CORRETA (VALIDAÇÃO SEPARADA) -----------
+
+class ContactValidator {
+  validate(contact: { email: string }) {
+    return contact.email.includes("@");
+  }
+}
+
+class EmailSender {
+  constructor(private validator: ContactValidator) {}
+
+  sendEmail(contact: { email: string }, message: string) {
+    if (!this.validator.validate(contact)) {
+      throw new Error("Contato inválido");
+    }
+
+    console.log(`Email enviado para ${contact.email}: ${message}`);
+  }
+}
 
